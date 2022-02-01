@@ -1,34 +1,67 @@
-// ℹ️ Gets access to environment variables/settings
-// https://www.npmjs.com/package/dotenv
-require('dotenv/config');
+require('dotenv').config();
 
-// ℹ️ Connects to the database
-require('./db');
+const bodyParser   = require('body-parser');
+const cookieParser = require('cookie-parser');
+const express      = require('express');
+const favicon      = require('serve-favicon');
+const hbs          = require('hbs');
+const mongoose     = require('mongoose');
+const logger       = require('morgan');
+const path         = require('path');
 
-// Handles http requests (express is node js framework)
-// https://www.npmjs.com/package/express
-const express = require('express');
 
-// Handles the handlebars
-// https://www.npmjs.com/package/hbs
-const hbs = require('hbs');
+mongoose
+  .connect('mongodb://localhost/movies-celebrities', {useNewUrlParser: true})
+  .then(x => {
+    console.log(`Connected to Mongo! Database name: "${x.connections[0].name}"`)
+  })
+  .catch(err => {
+    console.error('Error connecting to mongo', err)
+  });
+
+const app_name = require('./package.json').name;
+const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
 
 const app = express();
 
-// ℹ️ This function is getting exported from the config folder. It runs most middlewares
-require('./config')(app);
+// Middleware Setup
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+// Express View engine setup
+
+app.use(require('node-sass-middleware')({
+  src:  path.join(__dirname, 'public'),
+  dest: path.join(__dirname, 'public'),
+  sourceMap: true
+}));
+      
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+
+
 
 // default value for title local
-const projectName = 'lab-movies-celebrities';
-const capitalized = string => string[0].toUpperCase() + string.slice(1).toLowerCase();
+app.locals.title = 'Express - Generated with IronGenerator';
 
-app.locals.title = `${capitalized(projectName)}- Generated with Ironlauncher`;
 
-// 👇 Start handling routes here
+
 const index = require('./routes/index');
 app.use('/', index);
 
-// ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
-require('./error-handling')(app);
+app.use('/celebrities', require('./routes/celebrities-routes'));
+
+// the longer way:
+// const movieRoutes = require('./routes/movies-routes');
+// app.use('/movies', movieRoutes);
+
+// the shorter way of this above ^^^^^
+app.use('/movies', require('./routes/movies-routes'));
+
 
 module.exports = app;
