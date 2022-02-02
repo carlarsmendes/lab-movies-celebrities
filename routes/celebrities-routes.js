@@ -28,6 +28,7 @@ celebrityRouter.post('/', (req, res, next) => {
   Celebrity.create(req.body)
   .then( newCelebrity => {
     console.log("New celeb: ", newCelebrity);
+    res.render('celebrities/new-celebrity',{newCelebrity});
   } )
   .catch(err => console.log('Err while creating new celebrity: ', err));
 } )

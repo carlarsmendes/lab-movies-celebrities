@@ -1,7 +1,24 @@
 <form action="/celebrities" method="POST" >
-  <input type="text" name="name" id="" placeholder="celebrity name"> <br>
-  <input type="text" name="occupation" id="" placeholder="celebrity occupation"> <br>
-  <input type="text" name="catchPhrase" id="" placeholder="celebrity catch phrase"> <br>
+    <!--Show alert after creation of new celebrity-->
+    {{#if newCelebrity}}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        New celebrity created: <strong>{{newCelebrity.name}}!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
-  <button type="submit">Save the celebrity</button>
+    {{/if}}
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Celebrity Name</label>
+        <input type="text" name="name" id="" placeholder="Eg.: Tom Cruise"> 
+    </div>
+    <div class="mb-3">
+        <label for="occupation" class="form-label">Celebrity Occupation</label>
+        <input type="text" name="occupation" id="" placeholder="Eg.: Actor, firefighter..."> 
+    </div>
+    <div class="mb-3">
+        <label for="catchPhrase" class="form-label">Celebrity Catchphras</label>
+        <input type="text" name="catchPhrase" id="" placeholder="Eg.: Show me the money!!"> 
+    </div>
+    <button type="submit" class="btn btn-primary">Save the celebrity</button>
 </form>
